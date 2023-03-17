@@ -10,5 +10,5 @@ To install in your Qwiklabs project, open a Cloud Shell in your Qwiklabs project
 ```bash
 gcloud config project set <your-qwiklabs-project-id>
 gcloud config set compute/region <your-preferred-cloud-region>
-bash <(curl -s https://github.com/javiercanadillas/qwiklabs-cloudshell-setup/setup_qw_cs)
+bash <(curl -s https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/setup_qw_cs)
 ```

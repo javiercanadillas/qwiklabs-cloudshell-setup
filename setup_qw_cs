@@ -15,7 +15,7 @@ config_dir="$HOME/.config/cloudshell"
 project_id=
 region=
 # Repo URIs for all assets
-git_base_uri="https://www.github.com/javiercanadillas"
+git_base_uri="bash <(curl -s https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
 declare -A file_uris
 file_uris=(
   [labenv_uri]="$git_base_uri/.labenv.sh"
