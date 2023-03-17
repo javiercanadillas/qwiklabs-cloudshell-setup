@@ -78,6 +78,8 @@ check_gcp_env() {
     _error "Error trying to read Project ID."; exit 1; }
   [[ -z $project_id ]] && {
     _error "Project ID has not been set. Please, run \"gcloud config set project <project_id>\" and try again."; exit 1; }
+  region=$(gcloud config get-value compute/region 2>/dev/null)
+  region=${region:-europe-west1}
 }
 
 ## Sets up Cloud Shell so necessary binaries and packages are installed upon VM startup

@@ -12,7 +12,7 @@ export PROJECT_ID
 
 ## Unconmment sections that you want enabled, replacing tags YOUR_* with
 ## the actual values you desire
-GCP Region configuration
+#GCP Region configuration
 REGION=YOUR_REGION
 export REGION
 gcloud config set compute/region $REGION 2> /dev/null
