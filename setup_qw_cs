@@ -47,9 +47,9 @@ _download_file() {
     _info "Downloading:
     from: $git_dwl_uri
     into: $dest_dir"
-    pushd "$dest_dir" || exit
+    pushd "$dest_dir" > /dev/null || exit
     curl -sLJO "$git_dwl_uri" 
-    popd || exit
+    popd > /dev/null || exit
   else
     _error "$dest_dir does not exist, please check that it does."
   fi
@@ -126,7 +126,7 @@ cloudshell_prompt_setup() {
 ## Register this script has been run
 wrapup() {
   touch "$config_dir/.setup_qw_cs_run"
-  echo "Now run \"source $HOME/.bashrc\" to make all changes effective"
+  _info "Now run \"source $HOME/.bashrc\" to make all changes effective"
 }
 
 ## Main routine, follow configuration in sequential order
