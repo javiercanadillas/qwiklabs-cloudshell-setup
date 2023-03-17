@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+## Prevent this script from being sourced
+#shellcheck disable=SC2317
+return 0  2>/dev/null || :
+
+#skaffold_version="2.1.0"
+#skaffold_bin_loc="https://storage.googleapis.com/skaffold/releases/v${skaffold_version}/skaffold-linux-amd64"
+skaffold_bin_loc_bleeding_edge="https://storage.googleapis.com/skaffold/builds/latest/skaffold-linux-amd64"
+skaffold_uri="$skaffold_bin_loc_bleeding_edge"
+ko_version="0.12.0"
+
+# Install Skaffold latest version, required for Cloud Run Deployer hooks
+install_skaffold() {
+  # Install Skaffold pre-reqs for Cloud Code
+  sudo apt-get install google-cloud-sdk-log-streaming -qq
+  # Install Skaffold desired version
+  curl -Lso skaffold "$1"
+  sudo install skaffold /usr/local/bin/
+  rm skaffold
+}
+
+# Installing ko, this is only required for local run-web debugging
+install_ko() {
+    local VERSION=$1
+    local OS=Linux
+    local ARCH=x86_64
+    curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
+    tar xzf ko.tar.gz ko
+    sudo install ko /usr/local/bin
+    rm ko*
+}
+
+# Install shellcheck for debugging
+install_shellcheck() {
+  sudo apt install shellcheck
+}
+
+# Install Bat (Better cat)
+install_bat() {
+  sudo apt install bat
+  # As bat will be installed as batcat, make a softlink in the $HOME/bin directory
+  ln -s /usr/bin/batcat "$HOME/bin"
+}
+
+main() {
+  install_skaffold "$skaffold_uri"
+  install_ko "$ko_version"
+  install_shellcheck
+  install_bat
+}
+
+main "${@}"
