@@ -9,7 +9,7 @@ return 0  2>/dev/null || :
 set -uo pipefail
 
 ## Main Script vars
-script_name=$(basename "${BASH_SOURCE[0]}")
+script_name="setup_qw_cs"
 config_dir="$HOME/.config/cloudshell"
 project_id=
 region=
@@ -113,12 +113,12 @@ cloudshell_session_setup() {
   rm -- "${config_dir}/.labenv.bash.backup"
 
   # Insert "source labenv.bash" into ".bashrc" if not there already
-  grep -qxF "source $config_dir/.labenv.bash" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
+  grep -qxF "source \"$config_dir/.labenv.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
 }
 
 cloudshell_prompt_setup() {
   _info "Modifying bash prompt..."
-  grep -qxF "source $config_dir/.prompt.bash" "$HOME/.bashrc" || echo "source \"$config_dir/.prompt.bash\"" >> "$HOME/.bashrc"
+  grep -qxF "source \"$config_dir/.prompt.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.prompt.bash\"" >> "$HOME/.bashrc"
 }
 
 ## Register this script has been run
