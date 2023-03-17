@@ -47,7 +47,7 @@ _download_file() {
     _info "Downloading:
     from: $git_dwl_uri
     into: $dest_dir"
-    popd "$HOME/$dest_dir" || exit
+    popd "$dest_dir" || exit
     curl -LJO "$git_dwl_uri" 
     pushd || exit
   else
