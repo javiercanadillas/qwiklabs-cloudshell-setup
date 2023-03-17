@@ -10,7 +10,6 @@ set -uo pipefail
 
 ## Main Script vars
 script_name=$(basename "${BASH_SOURCE[0]}")
-script_dir=$(dirname "$(readlink --canonicalize --no-newline "${BASH_SOURCE[0]}")")
 config_dir="$HOME/.config/cloudshell"
 project_id=
 region=
