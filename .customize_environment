@@ -33,7 +33,7 @@ install_ko() {
 
 # Install shellcheck for debugging
 install_shellcheck() {
-  sudo apt install shellcheck -qq -y 
+  sudo apt install shellcheck -qq -y
 }
 
 # Install Bat (Better cat)
