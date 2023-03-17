@@ -48,7 +48,7 @@ _download_file() {
     from: $git_dwl_uri
     into: $dest_dir"
     pushd "$dest_dir" || exit
-    curl -LJO "$git_dwl_uri" 
+    curl -sLJO "$git_dwl_uri" 
     popd || exit
   else
     _error "$dest_dir does not exist, please check that it does."

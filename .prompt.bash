@@ -147,7 +147,7 @@ __powerline() {
             local symbol="$COLOR_FAILURE $PS_SYMBOL $COLOR_RESET"
         fi
 
-        local host="$COLOR_HOST$BOLD\h $COLOR_RESET"
+        local host="${COLOR_HOST}${BOLD}cloudshell ${COLOR_RESET}"
         local cwd
         if [[ $POWERLINE_PROCESSPATH = 0  ]]; then
             cwd="$COLOR_CWD\W$COLOR_RESET"
