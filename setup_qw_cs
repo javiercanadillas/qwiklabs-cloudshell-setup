@@ -14,11 +14,11 @@ config_dir="$HOME/.config/cloudshell"
 project_id=
 region=
 # Repo URIs for all assets
-git_base_uri="bash <(curl -s https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
+git_base_uri="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
 declare -A file_uris
 file_uris=(
-  [labenv_uri]="$git_base_uri/.labenv.sh"
-  [prompt_uri]="$git_base_uri/.prompt.sh"
+  [labenv_uri]="$git_base_uri/.labenv.bash"
+  [prompt_uri]="$git_base_uri/.prompt.bash"
   [cust_env_uri]="$git_base_uri/.customize_environment"
 )
 # Look & feel related vars
@@ -47,9 +47,9 @@ _download_file() {
     _info "Downloading:
     from: $git_dwl_uri
     into: $dest_dir"
-    popd "$dest_dir" || exit
+    pushd "$dest_dir" || exit
     curl -LJO "$git_dwl_uri" 
-    pushd || exit
+    popd || exit
   else
     _error "$dest_dir does not exist, please check that it does."
   fi
@@ -93,24 +93,27 @@ cloudshell_vm_setup() {
   cp -- "${config_dir}/.customize_environment" "${HOME}/.customize_environment"
   chmod 755 "$HOME/.customize_environment"
   
+  # Make a local bin directory
+  mkdir -p "$HOME/bin"
+
   # Run the installation of packages for the first time
   #shellcheck source=.customize_environment
-  source "$HOME/.customize_environment"
+  "$HOME/.customize_environment"
 }
 
 ## Sources main lab environment script and makes sure it's sourced each time a new shell is opened
 cloudshell_session_setup() {
   _info "Setting up .bashrc configuration..."
-  # Modify vars in labenv.sh script so they persist for next executions
+  # Modify vars in labenv.bash script so they persist for next executions
   sed -i'.backup' \
       -e "s|YOUR_PROJECT_ID|${project_id}|g" \
       -e "s|YOUR_REGION|${region}|g" \
       -e "s|YOUR_CONFIG_DIR|${config_dir}|g" \
-      "${config_dir}/.labenv.sh"
-  rm -- "${config_dir}/.labenv.sh.backup"
+      "${config_dir}/.labenv.bash"
+  rm -- "${config_dir}/.labenv.bash.backup"
 
-  # Insert "source labenv.sh" into ".bashrc" if not there already
-  grep -qxF "source $config_dir/.labenv.sh" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.sh\"" >> "$HOME/.bashrc"
+  # Insert "source labenv.bash" into ".bashrc" if not there already
+  grep -qxF "source $config_dir/.labenv.bash" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
 }
 
 cloudshell_prompt_setup() {
