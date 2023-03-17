@@ -24,6 +24,7 @@ file_uris=(
 # Look & feel related vars
 red=$(tput setaf 1)
 green=$(tput setaf 2)
+bold=$(tput bold)
 reset=$(tput sgr0)
 
 ## Format _info messages with script name in green
@@ -123,10 +124,22 @@ cloudshell_prompt_setup() {
   grep -qxF "source \"$config_dir/.prompt.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.prompt.bash\"" >> "$HOME/.bashrc"
 }
 
+editor_setup() {
+  local -r theia_config_dir="$HOME/.theia"
+  jq '. += {
+            "workbench.colorTheme": "Default Dark+",
+            "editor.tabSize": 2,
+            "editor.fontSize": 14,
+            "terminal.integrated.fontSize": 14
+            }' "$theia_config_dir/settings.json" > "$theia_config_dir/settings.json.enhanced"
+  cp -- "$theia_config_dir/settings.json{,.backup}"
+  cp -- "$theia_config_dir/settings.json{.enhanced,}"
+}
+
 ## Register this script has been run
 wrapup() {
   touch "$config_dir/.setup_qw_cs_run"
-  _info "Now run \"source $HOME/.bashrc\" to make all changes effective"
+  _info "Now run ${bold}\"source $HOME/.bashrc\"${reset} to make all changes effective"
 }
 
 ## Main routine, follow configuration in sequential order
@@ -138,6 +151,7 @@ main() {
   cloudshell_session_setup
   cloudshell_vm_setup
   cloudshell_prompt_setup
+  editor_setup
   wrapup
 }
 
