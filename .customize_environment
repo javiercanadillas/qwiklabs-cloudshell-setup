@@ -40,7 +40,13 @@ install_shellcheck() {
 install_bat() {
   sudo apt install bat -qq -y
   # As bat will be installed as batcat, make a softlink in the $HOME/bin directory
-  ln -s /usr/bin/batcat "$HOME/bin"
+  ln -s /usr/bin/batcat "$HOME/bin/bat"
+  local -r batcatconfdir="$HOME/.config/bat"
+  mkdir -p "$batcatconfdir"
+  cat <<-EOF > "$batcatconfdir/config"
+#Set the theme to "base16"
+--theme="base16"
+EOF
 }
 
 main() {
