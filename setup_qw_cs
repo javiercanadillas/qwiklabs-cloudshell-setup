@@ -117,6 +117,8 @@ cloudshell_session_setup() {
 
   # Insert "source labenv.bash" into ".bashrc" if not there already
   grep -qxF "source \"$config_dir/.labenv.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
+  # Insert "source labenv_custom.bash" into ".bashrc" if not there already
+  grep -qxF "source \"$config_dir/.labenv_custom.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv_custom.bash\"" >> "$HOME/.bashrc"
 }
 
 cloudshell_prompt_setup() {
@@ -132,8 +134,8 @@ editor_setup() {
             "editor.fontSize": 14,
             "terminal.integrated.fontSize": 14
             }' "$theia_config_dir/settings.json" > "$theia_config_dir/settings.json.enhanced"
-  cp -- "$theia_config_dir/settings.json{,.backup}"
-  cp -- "$theia_config_dir/settings.json{.enhanced,}"
+  cp -- "$theia_config_dir/settings.json"{,.backup}
+  cp -- "$theia_config_dir/settings.json"{.enhanced,}
 }
 
 ## Register this script has been run

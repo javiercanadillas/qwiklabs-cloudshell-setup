@@ -16,5 +16,22 @@ gcloud config set compute/region <your-preferred-cloud-region>
 Then, run the Cloud Shell configuration:
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/setup_qw_cs)
+CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/setup_qw_cs"
+bash <(curl -s "$CS_SOURCE")
 ```
+
+If you just want to download the file first, make modifications and then run it, do the following:
+
+```bash
+# Download the file
+CS_SETUP="setup_qw_cs"
+CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/$CS_SETUP"
+curl -s "$CS_SOURCE" -o "$HOME/$CS_SETUP"
+# Make your modifications
+# Run it
+bash -x "$HOME/$CS_SETUP"
+```
+
+## Adding post script customizations
+
+`setup_qw_cs` sources `$HOME/.labenv_custom.bash`. If you desire more customizations to your cloudshell, you can add them there.
