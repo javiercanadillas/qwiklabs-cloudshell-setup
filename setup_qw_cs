@@ -118,7 +118,7 @@ cloudshell_session_setup() {
   # Insert "source labenv.bash" into ".bashrc" if not there already
   grep -qxF "source \"$config_dir/.labenv.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
   # Insert "source labenv_custom.bash" into ".bashrc" if not there already
-  grep -qxF "source \"$config_dir/.labenv_custom.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv_custom.bash\"" >> "$HOME/.bashrc"
+  grep -qxF "source \"$HOME/.labenv_custom.bash\"" "$HOME/.bashrc" || echo "source \"$HOME/.labenv_custom.bash\"" >> "$HOME/.bashrc"
 }
 
 cloudshell_prompt_setup() {
