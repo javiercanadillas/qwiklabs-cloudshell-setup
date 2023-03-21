@@ -4,6 +4,9 @@
 ## of inactivity, and it will restore the necessary installed software and environment variables to its desired
 ## state
 
+# Expand directories to avoid escaping of $ signs in variables
+shopt -s direxpand
+
 ## Set desired environment variables
 # GCP Project ID configuraiton
 PROJECT_ID=YOUR_PROJECT_ID
