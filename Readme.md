@@ -9,7 +9,7 @@ This repo contains a basic Cloud Shell setup for Qwiklabs, including:
 To install in your Qwiklabs project, open a Cloud Shell in your Qwiklabs project and do a minimum setup (this step will be required once during the whole duration of the lab):
 
 ```bash
-gcloud config project set <your-qwiklabs-project-id>
+gcloud config set project <your-qwiklabs-project-id>
 gcloud config set compute/region <your-preferred-cloud-region>
 ```
 
