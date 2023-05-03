@@ -128,6 +128,8 @@ cloudshell_prompt_setup() {
 
 editor_setup() {
   local -r theia_config_dir="$HOME/.theia"
+  # Theia dir may not exist if Theia hasn't been launched yet for the first time
+  touch theia_config_dir
   jq '. += {
             "workbench.colorTheme": "Default Dark+",
             "editor.tabSize": 2,
