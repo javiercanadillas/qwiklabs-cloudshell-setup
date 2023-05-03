@@ -5,7 +5,7 @@
 return 0  2>/dev/null || :
 
 #skaffold_version="2.1.0"
-#skaffold_bin_loc="https://storage.googleapis.com/skaffold/releases/v${skaffold_version}/skaffold-linux-amd64"
+skaffold_bin_loc="https://storage.googleapis.com/skaffold/releases/v${skaffold_version}/skaffold-linux-amd64"
 skaffold_bin_loc_bleeding_edge="https://storage.googleapis.com/skaffold/builds/latest/skaffold-linux-amd64"
 skaffold_uri="$skaffold_bin_loc_bleeding_edge"
 ko_version="0.12.0"
@@ -50,7 +50,7 @@ EOF
 }
 
 main() {
-  install_skaffold "$skaffold_uri"
+  #install_skaffold "$skaffold_uri"
   install_ko "$ko_version"
   install_shellcheck
   install_bat
