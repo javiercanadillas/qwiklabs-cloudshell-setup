@@ -132,8 +132,13 @@ editor_setup() {
   _info "Setting up Theia basic configuration..."
   local -r theia_config_dir="$HOME/.theia"
   # Theia dir may not exist if Theia hasn't been launched yet for the first time
-  mkdir -p "$theia_config_dir"
-  touch "$theia_config_dir/settings.json"
+  [[ -d "$theia_config_dir ]] || {
+    mkdir -p "$theia_config_dir"
+    cat <<EOF > "$theia_config_dir/settings.json"
+    {}
+    EOF
+  }
+  # Add basic configuration to Theia
   jq '. += {
             "workbench.colorTheme": "Default Dark+",
             "editor.tabSize": 2,
@@ -147,7 +152,7 @@ editor_setup() {
 ## Register this script has been run
 wrapup() {
   touch "$config_dir/.setup_qw_cs_run"
-  _info "Now run ${bold}\"source $HOME/.bashrc\"${reset} to make all changes effective"
+  _info "Now run ${bold}\"source \$HOME/.bashrc\"${reset} to make all changes effective"
 }
 
 ## Main routine, follow configuration in sequential order
