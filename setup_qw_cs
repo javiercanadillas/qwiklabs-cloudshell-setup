@@ -132,11 +132,12 @@ editor_setup() {
   _info "Setting up Theia basic configuration..."
   local -r theia_config_dir="$HOME/.theia"
   # Theia dir may not exist if Theia hasn't been launched yet for the first time
-  [[ -d "$theia_config_dir ]] || {
+  [[ -d "$theia_config_dir ]] || { \
     mkdir -p "$theia_config_dir"
     cat <<EOF > "$theia_config_dir/settings.json"
     {}
-    EOF
+    EOF \
+    ;
   }
   # Add basic configuration to Theia
   jq '. += {
