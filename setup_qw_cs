@@ -106,6 +106,7 @@ cloudshell_vm_setup() {
 
 ## Sources main lab environment script and makes sure it's sourced each time a new shell is opened
 cloudshell_session_setup() {
+  local -r custom_lab_env=".labenv_custom.bash"
   _info "Setting up .bashrc configuration..."
   # Modify vars in labenv.bash script so they persist for next executions
   sed -i'.backup' \
@@ -117,8 +118,9 @@ cloudshell_session_setup() {
 
   # Insert "source labenv.bash" into ".bashrc" if not there already
   grep -qxF "source \"$config_dir/.labenv.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
-  # Insert "source labenv_custom.bash" into ".bashrc" if not there already
-  grep -qxF "source \"$HOME/.labenv_custom.bash\"" "$HOME/.bashrc" || echo "source \"$HOME/.labenv_custom.bash\"" >> "$HOME/.bashrc"
+  # Insert "source $custom_lab_env" into ".bashrc" if not there already
+  touch "$HOME/$custom_lab_env"
+  grep -qxF "source \"$HOME/$custom_lab_env\"" "$HOME/.bashrc" || echo "source \"$HOME/$custom_lab_env\"" >> "$HOME/.bashrc"
 }
 
 cloudshell_prompt_setup() {
@@ -129,7 +131,7 @@ cloudshell_prompt_setup() {
 editor_setup() {
   local -r theia_config_dir="$HOME/.theia"
   # Theia dir may not exist if Theia hasn't been launched yet for the first time
-  touch theia_config_dir
+  mkdir -p theia_config_dir
   jq '. += {
             "workbench.colorTheme": "Default Dark+",
             "editor.tabSize": 2,
