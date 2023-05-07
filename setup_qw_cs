@@ -11,8 +11,6 @@ set -uo pipefail
 ## Main Script vars
 script_name="setup_qw_cs"
 config_dir="$HOME/.config/cloudshell"
-project_id=
-region=
 # Repo URIs for all assets
 git_base_uri="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
 declare -A file_uris
@@ -75,12 +73,12 @@ download_assets() {
 check_gcp_env() {
   # This script should not continue if Project ID is not set
   _info "Checking that Project ID has been properly set..."
-  project_id=$(gcloud config get-value project --quiet 2> /dev/null) || {
-    _error "Error trying to read Project ID."; exit 1; }
+  project_id="${PROJECT_ID:-$(gcloud config get-value project --quiet 2> /dev/null)}"
   [[ -z $project_id ]] && {
     _error "Project ID has not been set. Please, run \"gcloud config set project <project_id>\" and try again."; exit 1; }
-  region=$(gcloud config get-value compute/region 2>/dev/null)
-  region=${region:-europe-west1}
+  region="${REGION:-$(gcloud config get-value compute/region 2>/dev/null)}"
+  [[ -z $region ]] && {
+    _info "No region was provided. Assigning default compute region europe-west1."; region="europe-west1"; }
 }
 
 ## Sets up Cloud Shell so necessary binaries and packages are installed upon VM startup
