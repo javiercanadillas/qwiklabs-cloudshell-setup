@@ -25,6 +25,13 @@ gcloud config set run/region $REGION 2> /dev/null
 #WORKDIR=YOUR_WORKDIR
 #export WORKDIR
 
+# Enable kubectl autocompletion and use kubectl alias
+#shellcheck disable=SC1090
+source <(kubectl completion bash)
+alias k=kubectl
+complete -o default -F __start_kubectl k
+
+
 # Mark the sourcing of this file
 mkdir -p YOUR_CONFIG_DIR
 touch "YOUR_CONFIG_DIR/.labenv_sourced"
