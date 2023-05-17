@@ -27,8 +27,12 @@ If you just want to download the file first, make modifications and then run it,
 CS_SETUP="setup_qw_cs"
 CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/$CS_SETUP"
 curl -s "$CS_SOURCE" -o "$HOME/$CS_SETUP"
-# Make your modifications
-# Run it
+# Now Make your modifications using your favorite editor
+```
+
+And once done, run it:
+
+```bash
 bash -x "$HOME/$CS_SETUP"
 ```
 
