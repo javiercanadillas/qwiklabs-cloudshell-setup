@@ -10,10 +10,14 @@ skaffold_bin_loc_bleeding_edge="https://storage.googleapis.com/skaffold/builds/l
 skaffold_uri="$skaffold_bin_loc_bleeding_edge"
 ko_version="0.12.0"
 
-# Install Skaffold latest version, required for Cloud Run Deployer hooks
-install_skaffold() {
+# Install Skaffold dependencies
+install_skaffold_deps() {
   # Install Skaffold pre-reqs for Cloud Code
   sudo apt-get install google-cloud-sdk-log-streaming -qq
+}
+
+# Install Skaffold latest version, required for Cloud Run Deployer hooks
+install_skaffold() {
   # Install Skaffold desired version
   curl -Lso skaffold "$1"
   sudo install skaffold /usr/local/bin/
@@ -50,6 +54,7 @@ EOF
 }
 
 main() {
+  install_skaffold_deps
   #install_skaffold "$skaffold_uri"
   install_ko "$ko_version"
   install_shellcheck
