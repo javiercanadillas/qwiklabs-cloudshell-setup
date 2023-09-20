@@ -16,7 +16,7 @@ git_base_uri="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-clouds
 declare -A file_uris
 file_uris=(
   [labenv_uri]="$git_base_uri/.labenv.bash"
-  [prompt_uri]="$git_base_uri/.prompt.bash"
+  [prompt_uri]="$git_base_uri/.prompt"
   [cust_env_uri]="$git_base_uri/.customize_environment"
 )
 # Look & feel related vars
