@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# (C) Javier Cañadillas, 2024 - javier@canadillas.org
 
 ## Prevent this script from being sourced
 #shellcheck disable=SC2317

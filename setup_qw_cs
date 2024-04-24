@@ -1,84 +1,101 @@
 #!/usr/bin/env bash
-## setup_qw_cs: sets a reasonable Cloud Shell environment to be used in Qwiklabs
-## Designed to be installed straight from GitHub, pulling additional assets from there.
+# setup_qw_cs: sets a reasonable Cloud Shell environment to be used in Qwiklabs.
+#              Designed to be installed straight from GitHub, pulling additional
+#              assets from there.
+# (C) Javier Cañadillas, 2024 - javier@canadillas.org
 
-## Prevent this script from being sourced
+# Prevent this script from being sourced
 #shellcheck disable=SC2317
 return 0  2>/dev/null || :
 
 set -uo pipefail
 
-## Main Script vars
-script_name="setup_qw_cs"
-config_dir="$HOME/.config/cloudshell"
-# Repo URIs for all assets
-git_base_uri="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
-declare -A file_uris
-file_uris=(
-  [labenv_uri]="$git_base_uri/.labenv.bash"
-  [prompt_uri]="$git_base_uri/.prompt"
-  [cust_env_uri]="$git_base_uri/.customize_environment"
-)
-# Look & feel related vars
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-bold=$(tput bold)
-reset=$(tput sgr0)
+# Prepare script initialization variables and functions
+_init_script() {
+  ## Main Script vars
+  script_name="setup_qw_cs"
+  config_dir="$HOME/.config/cloudshell"
 
-## Format _info messages with script name in green
-_info() {
-  echo "${green}${script_name}${reset}: ${1}" >&2
+  # Repo URIs for all assets
+  git_base_uri="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main"
+  declare -A file_uris
+  file_uris=(
+    [labenv_uri]="$git_base_uri/.labenv.bash"
+    [prompt_uri]="$git_base_uri/.prompt"
+    [cust_env_uri]="$git_base_uri/.customize_environment"
+  )
+
+  # Look & feel related vars
+  red=$(tput setaf 1)
+  green=$(tput setaf 2)
+  bold=$(tput bold)
+  reset=$(tput sgr0)
+  
+  ## Format _info messages with script name in green
+  _info() {
+    echo "${green}${script_name}${reset}: ${1}" >&2
+  }
+  
+  ## Format _error messages with script name in red
+  _error() {
+    echo "${red}${script_name}${reset}: ${1}" >&2
+  }
+
+  ## Download a file from git
+  ##   github-download git_dwl_uri dest_dir
+  _download_file() {
+    local -r git_dwl_uri="$1"
+    shift
+    local -r dest_dir="${1:-"$config_dir"}"
+    shift
+    if [[ -d "$dest_dir" ]]; then
+      _info "Downloading:
+      from: $git_dwl_uri
+      into: $dest_dir"
+      pushd "$dest_dir" > /dev/null || exit
+      curl -sLJO "$git_dwl_uri" 
+      popd > /dev/null || exit
+    else
+      _error "$dest_dir does not exist, please check that it does."
+    fi
+  }
 }
 
-## Format _error messages with script name in red
-_error() {
-  echo "${red}${script_name}${reset}: ${1}" >&2
-}
-
-## Download a file from git
-##   github-download git_dwl_uri dest_dir
-_download_file() {
-  local -r git_dwl_uri="$1"
-  shift
-  local -r dest_dir="${1:-"$config_dir"}"
-  shift
-  if [[ -d "$dest_dir" ]]; then
-    _info "Downloading:
-    from: $git_dwl_uri
-    into: $dest_dir"
-    pushd "$dest_dir" > /dev/null || exit
-    curl -sLJO "$git_dwl_uri" 
-    popd > /dev/null || exit
-  else
-    _error "$dest_dir does not exist, please check that it does."
-  fi
-}
-
-## Make assets directory in Qwiklabs Cloud Shell Machine
-create_config() {
-  _info "Creating Cloud Shell assets config dir..."
-  mkdir -p "$config_dir"
-}
-
-## Download main assets used by this installer from GitHub
-## to the $config_dir directory, to later be processed by the script
+# Download main assets used by this installer from GitHub
+# to the $config_dir directory, to later be processed by the script
 download_assets() {
+  _info "Creating Cloud Shell assets config dir..."
+  mkdir -p "$config_dir" || _error "Could not create $config_dir"
   _info "Downloading assets from GitHub..."
   for file_uri in "${file_uris[@]}"; do
     _download_file "$file_uri"
   done
 }
 
-## Check that project ID and region have been set by the student in Qwiklabs
+# Check that project ID and region have been set by the student in Qwiklabs
 check_gcp_env() {
   # This script should not continue if Project ID is not set
   _info "Checking that Project ID has been properly set..."
   project_id="${PROJECT_ID:-$(gcloud config get-value project --quiet 2> /dev/null)}"
   [[ -z $project_id ]] && {
     _error "Project ID has not been set. Please, run \"gcloud config set project <project_id>\" and try again."; exit 1; }
+  export PROJECT_ID="$project_id" # export it for further scripts
+
+  _info "Checking existing cloud region..."
   region="${REGION:-$(gcloud config get-value compute/region 2>/dev/null)}"
   [[ -z $region ]] && {
     _info "No region was provided. Assigning default compute region europe-west1."; region="europe-west1"; }
+  export REGION="$region" # export it for further scripts
+}
+
+# Create a gcloud SDK configuration for convenience
+gcloud_sdk_setup() {
+  _info "Setting up gcloud CLI configuration..."
+  export CLOUDSDK_CONFIG="$HOME/.config/gcloud"
+  gcloud config configurations create default
+  gcloud config set project "$project_id"
+  gcloud config set compute/region "$region"
+  gcloud config set run/region "$region"
 }
 
 ## Sets up Cloud Shell so necessary binaries and packages are installed upon VM startup
@@ -95,7 +112,7 @@ cloudshell_vm_setup() {
   chmod 755 "$HOME/.customize_environment"
   
   # Make a local bin directory
-  mkdir -p "$HOME/bin"
+  mkdir -p "$HOME/.local/bin"
 
   # Run the installation of packages for the first time
   #shellcheck source=.customize_environment
@@ -104,30 +121,28 @@ cloudshell_vm_setup() {
 
 ## Sources main lab environment script and makes sure it's sourced each time a new shell is opened
 cloudshell_session_setup() {
-  local -r custom_lab_env=".labenv_custom.bash"
+  export -r main_config="main_config.bash"
+  export -r custom_config="custom_config.bash"
   _info "Setting up .bashrc configuration..."
-  # Modify vars in labenv.bash script so they persist for next executions
-  sed -i'.backup' \
-      -e "s|YOUR_PROJECT_ID|${project_id}|g" \
-      -e "s|YOUR_REGION|${region}|g" \
-      -e "s|YOUR_CONFIG_DIR|${config_dir}|g" \
-      "${config_dir}/.labenv.bash"
-  rm -- "${config_dir}/.labenv.bash.backup"
 
-  # Insert "source labenv.bash" into ".bashrc" if not there already
-  grep -qxF "source \"$config_dir/.labenv.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.labenv.bash\"" >> "$HOME/.bashrc"
-  # Insert "source $custom_lab_env" into ".bashrc" if not there already
-  touch "$HOME/$custom_lab_env"
-  grep -qxF "source \"$HOME/$custom_lab_env\"" "$HOME/.bashrc" || echo "source \"$HOME/$custom_lab_env\"" >> "$HOME/.bashrc"
-}
+  # Create a place for bash configuraiton
+  bash_config_loc="$HOME/.config/bash"
+  mkdir -p "$bash_config_loc"
+  
+  # Place *_config.bash in the right place
+  cp -- "${config_dir}/*_config.bash" "$bash_config_loc"
+  chmod 755 "$bash_config_loc/*_config.bash"
+  
+  # Place prompt.bash in the right place
+  cp -- "${config_dir}/prompt.bash" "$bash_config_loc"
+  chmod 755 "$bash_config_loc/prompt.bash"
 
-cloudshell_prompt_setup() {
-  _info "Modifying bash prompt..."
-  grep -qxF "source \"$config_dir/.prompt.bash\"" "$HOME/.bashrc" || echo "source \"$config_dir/.prompt.bash\"" >> "$HOME/.bashrc"
+  # Insert "source main_config.bash" into ".bashrc" if not there already
+  grep -qxF "source \"${bash_config_loc}/${main_config}\"" "$HOME/.bashrc" || echo "source \"${bash_config_loc}/${main_config}\"" >> "$HOME/.bashrc"
 }
 
 editor_setup() {
-  _info "Setting up Theia basic configuration..."
+  _info "Setting up Code OSS basic configuration..."
   local -r theia_config_dir="$HOME/.theia"
   # Theia dir may not exist if Theia hasn't been launched yet for the first time
   [[ -d "$theia_config_dir" ]] || {
@@ -155,9 +170,10 @@ wrapup() {
 
 ## Main routine, follow configuration in sequential order
 main() {
+  _init_script
   _info "Setting up the environment..."
   check_gcp_env
-  create_config
+  gcloud_sdk_setup
   download_assets
   cloudshell_session_setup
   cloudshell_vm_setup
