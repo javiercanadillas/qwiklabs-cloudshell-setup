@@ -9,14 +9,14 @@ This repo contains a basic Cloud Shell setup for Qwiklabs, including:
 To install in your Qwiklabs project, open a Cloud Shell in your Qwiklabs project and do a minimum setup (this step will be required once during the whole duration of the lab):
 
 ```bash
-gcloud config set project <your-qwiklabs-project-id>
-gcloud config set compute/region <your-preferred-cloud-region>
+export PROJECT_ID=<your-qwiklabs-project-id>
+export GIT_BRANCH=dev
 ```
 
 Then, run the Cloud Shell configuration:
 
 ```bash
-CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/setup_qw_cs"
+CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/${GIT_BRANCH:-main}/setup_qw_cs"
 bash <(curl -s "$CS_SOURCE")
 ```
 
@@ -25,7 +25,7 @@ If you just want to download the file first, make modifications and then run it,
 ```bash
 # Download the file
 CS_SETUP="setup_qw_cs"
-CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/main/$CS_SETUP"
+CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/${GIT_BRANCH:-main}/$CS_SETUP"
 curl -s "$CS_SOURCE" -o "$HOME/$CS_SETUP"
 # Now Make your modifications using your favorite editor
 ```
