@@ -1,0 +1,21 @@
+{
+  "extensions.autoUpdate": true,
+  "workbench.colorTheme": "One Dark Pro",
+  "cloudcode.duetAI.project": "$PROJECT_ID",
+  "editor.fontSize": 14,
+  "debug.console.fontSize": 14,
+  "terminal.integrated.fontSize": 14,
+  "cloudcode.duetAI.languages": [
+      "python",
+      "terraform",
+      "shellscript",
+      "terraform-vars",
+      "yaml"
+  ],
+  "editor.accessibilitySupport": "off",
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.inlayHints.variableTypes": true,
+  "cloudcode.project": "$PROJECT_ID",
+  "workbench.startupEditor": "none"
+}

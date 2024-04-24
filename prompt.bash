@@ -6,22 +6,18 @@ __powerline() {
   # Colors
   COLOR_RESET='\[\033[m\]'
   COLOR_HOST=${COLOR_HOST:-'\[\033[0;33m\]'}       # yellow
-  COLOR_CWD=${COLOR_CWD:-'\[\033[0;248m\]'}        # dark grey
+  COLOR_CWD=${COLOR_CWD:-'\[\033[0;34m\]'}         # blue
   COLOR_GIT=${COLOR_GIT:-'\[\033[0;36m\]'}         # cyan
   COLOR_SUCCESS=${COLOR_SUCCESS:-'\[\033[0;32m\]'} # green
   COLOR_FAILURE=${COLOR_FAILURE:-'\[\033[0;31m\]'} # red
   COLOR_CONDA=${COLOR_CONDA:-'\[\033[0;35m\]'}     # margenta
 
   # Symbols
-  #SYMBOL_GIT_BRANCH=${SYMBOL_GIT_BRANCH:-⑂}
-  SYMBOL_GIT_BRANCH=${SYMBOL_GIT_BRANCH:-Y}
+  SYMBOL_GIT_BRANCH=${SYMBOL_GIT_BRANCH:-⑂}
   SYMBOL_GIT_MODIFIED=${SYMBOL_GIT_MODIFIED:-+}
-  #SYMBOL_GIT_PUSH=${SYMBOL_GIT_PUSH:-↑}
-  SYMBOL_GIT_PUSH=${SYMBOL_GIT_PUSH:-<}
-  #SYMBOL_GIT_PULL=${SYMBOL_GIT_PULL:-↓}
-  SYMBOL_GIT_PULL=${SYMBOL_GIT_PULL:->}
-  #SYMBOL_PYTHON=${SYMBOL_PYTHON:-ƨ}
-  SYMBOL_PYTHON=${SYMBOL_PYTHON:-S}
+  SYMBOL_GIT_PUSH=${SYMBOL_GIT_PUSH:-↑}
+  SYMBOL_GIT_PULL=${SYMBOL_GIT_PULL:-↓}
+  SYMBOL_PYTHON=${SYMBOL_PYTHON:-ƨ}
 
   # Font Options
   BOLD="\[$(tput bold)\]"
@@ -31,7 +27,7 @@ __powerline() {
 
   if [[ -z "$PS_SYMBOL" ]]; then
     case "$(uname)" in
-    Darwin) PS_SYMBOL='>' ;;
+    Darwin) PS_SYMBOL='$' ;;
     Linux) PS_SYMBOL='$' ;;
     *) PS_SYMBOL='%' ;;
     esac
@@ -134,7 +130,7 @@ __powerline() {
       venv="$COLOR_CONDA$(__virtualenv2)$COLOR_RESET"
     fi
 
-    PS1="$host$cwd$venv$git$symbol"
+    PS1="┌──${host}$cwd$venv$git\n└─>$symbol"
   }
 
   PROMPT_COMMAND=ps1

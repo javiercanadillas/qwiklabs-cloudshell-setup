@@ -1,53 +1,73 @@
 #!/usr/bin/env bash
 # (C) Javier Cañadillas, 2024 - javier@canadillas.org
-
 ## Prevent this script from being sourced
 #shellcheck disable=SC2317
 return 0  2>/dev/null || :
 
-#skaffold_version="2.1.0"
-skaffold_bin_loc="https://storage.googleapis.com/skaffold/releases/v${skaffold_version}/skaffold-linux-amd64"
-skaffold_bin_loc_bleeding_edge="https://storage.googleapis.com/skaffold/builds/latest/skaffold-linux-amd64"
-skaffold_uri="$skaffold_bin_loc_bleeding_edge"
-ko_version="0.12.0"
-
 # Install Skaffold dependencies
 install_skaffold_deps() {
-  # Install Skaffold pre-reqs for Cloud Code
-  sudo apt-get install google-cloud-sdk-log-streaming -qq
+    # Install Skaffold pre-reqs for Cloud Code
+  sudo apt-get -qq install google-cloud-sdk-log-streaming
 }
 
 # Install Skaffold latest version, required for Cloud Run Deployer hooks
 install_skaffold() {
+  #skaffold_version="2.1.0"
+  #skaffold_bin_loc="https://storage.googleapis.com/skaffold/releases/v${skaffold_version}/skaffold-linux-amd64"
+  skaffold_bin_loc_bleeding_edge="https://storage.googleapis.com/skaffold/builds/latest/skaffold-linux-amd64"
+  skaffold_uri="$skaffold_bin_loc_bleeding_edge"
+
   # Install Skaffold desired version
-  curl -Lso skaffold "$1"
+  local -r tmpdir="$(mktemp -d)"
+  pushd "$tmpdir" || :
+  curl -Lso skaffold "$skaffold_uri"
   sudo install skaffold /usr/local/bin/
   rm skaffold
+  popd || :
+}
+
+# Install crane ()
+install_crane() {
+  # Get latest version
+  crane_version=$(curl -s "https://api.github.com/repos/google/go-containerregistry/releases/latest" | jq -r '.tag_name')
+  local -r os=Linux       # or Darwin, Windows
+  local -r arch=x86_64    # or arm64, x86_64, armv6, i386, s390x
+  local -r tmpdir="$(mktemp -d)"
+  pushd "$tmpdir" || _error "Cannot create temporary directory"
+  curl -sL "https://github.com/google/go-containerregistry/releases/download/${crane_version}/go-containerregistry_${os}_${arch}.tar.gz" > go-containerregistry.tar.gz
+  tar -zxvf go-containerregistry.tar.gz crane
+  sudo install crane /usr/local/bin/
+  rm crane
+  rm go-containerregistry.tar.gz
+  popd || _error "Cannot exit temporary directory"
 }
 
 # Installing ko, this is only required for local run-web debugging
 install_ko() {
-    local VERSION=$1
-    local OS=Linux
-    local ARCH=x86_64
-    curl -sSfL "https://github.com/ko-build/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz" > ko.tar.gz
-    tar xzf ko.tar.gz ko
-    sudo install ko /usr/local/bin
-    rm ko*
+  local -r ko_version=0.15.2
+  local -r os=Linux
+  local -r arch=x86_64
+  local -r tmpdir="$(mktemp -d)" > /dev/null 2>&1
+  pushd "$tmpdir" || _error "Cannot create temporary directory"
+  curl -sSfL "https://github.com/ko-build/ko/releases/download/v${ko_version}/ko_${ko_version}_${os}_${arch}.tar.gz" > ko.tar.gz
+  tar xzf ko.tar.gz ko
+  sudo install ko /usr/local/bin
+  rm ko*
+  popd || _error "Cannot exit temporary directory"
 }
 
 # Install shellcheck for debugging
 install_shellcheck() {
-  sudo apt install shellcheck -qq -y
+  sudo apt -qq install shellcheck -y
 }
 
 # Install Bat (Better cat)
 install_bat() {
-  sudo apt install bat -qq -y
+  sudo apt -qq install bat -y
   # As bat will be installed as batcat, make a softlink in the $HOME/bin directory
-  ln -s /usr/bin/batcat "$HOME/bin/bat"
+  ln -s /usr/bin/batcat "$HOME/.local/bin/bat"
   local -r batcatconfdir="$HOME/.config/bat"
-  mkdir -p "$batcatconfdir"
+  mkdir -p "$batcatconfdir" || _error "Cannot create $batcatconfdir"
   cat <<EOF > "$batcatconfdir/config"
     #Set the theme to "base16"
     --theme="base16"
@@ -56,9 +76,10 @@ EOF
 
 main() {
   install_skaffold_deps
-  #install_skaffold "$skaffold_uri"
-  install_ko "$ko_version"
+  install_skaffold
+  install_ko
   install_shellcheck
+  install_crane
   install_bat
 }
 
