@@ -64,7 +64,7 @@ _init_script() {
   _p_echo() {
     local -r msg="${1}"
     shift 1
-    echo "$name_padding  $msg"
+    echo "$name_padding  $msg" >&2
   }
 
   # Download a file from git
@@ -81,6 +81,15 @@ _init_script() {
     else
       _error "$dest_dir does not exist, please check that it does."
     fi
+  }
+}
+
+# Make sure this script is run from a Cloud Shell VM
+check_cloudshell() {
+  _info "Checking that you're running a Cloud Shell VM..."
+  [[ "$CLOUD_SHELL" == "true" ]]  || {
+    _error "You must run this script from a Cloud Shell VM"
+    exit 1;
   }
 }
 
@@ -128,6 +137,7 @@ download_assets() {
 # and also executes it to install pre-reqs
 cloudshell_vm_setup() {
   _info "Installing necessary packages and setting up Cloud Shell startup..."
+  _p_echo "(This may take a while)"
   
   # Silence apt warnings in Cloud Shell
   mkdir -p "$HOME/.cloudshell"
@@ -145,11 +155,10 @@ cloudshell_vm_setup() {
   "$HOME/.customize_environment" 2>/dev/null 1>&2
 }
 
-# TODO: Implement this script
 # Performs user space ($HOME) one time configuration
 cloudshell_user_setup() {
   _info "Setting up Cloud Shell user configuration..."
-  _p_echo " This should be run only once at the initial Cloud Shell configuration)"
+  _p_echo "(This may take a while)"
   #shellcheck disable=SC1090
   source "$config_dir/${file_names[user_setup]}" >/dev/null 2>&1
 }
@@ -189,12 +198,13 @@ gemini_code_assist_setup() {
 ## Register this script has been run
 wrapup() {
   touch "$config_dir/.setup_qw_cs_run"
-  _info "Now run ${bold}\"source \$HOME/.bashrc\"${reset} to make all changes effective"
+  #_info "Now run ${bold}\"source \$HOME/.bashrc\"${reset} to make all changes effective"
 }
 
 ## Main routine, follow configuration in sequential order
 main() {
   _init_script
+  check_cloudshell
   _info "Setting up the environment..."
   check_gcp_env
   gcloud_sdk_setup

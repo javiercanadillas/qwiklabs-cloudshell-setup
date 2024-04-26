@@ -17,7 +17,7 @@ Then, run the Cloud Shell configuration:
 
 ```bash
 CS_SOURCE="https://raw.githubusercontent.com/javiercanadillas/qwiklabs-cloudshell-setup/${GIT_BRANCH:-main}/setup_qw_cs"
-bash <(curl -s "$CS_SOURCE")
+bash <(curl -s "$CS_SOURCE") && exec $SHELL -l
 ```
 
 If you just want to download the file first, make modifications and then run it, do the following:

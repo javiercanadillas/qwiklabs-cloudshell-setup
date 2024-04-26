@@ -6,7 +6,7 @@ return 0  2>/dev/null || :
 
 # Install Skaffold dependencies
 install_skaffold_deps() {
-    # Install Skaffold pre-reqs for Cloud Code
+  # Install Skaffold pre-reqs for Cloud Code
   sudo apt-get -qq install google-cloud-sdk-log-streaming
 }
 
@@ -26,7 +26,7 @@ install_skaffold() {
   popd || :
 }
 
-# Install crane ()
+# Install crane
 install_crane() {
   # Get latest version
   crane_version=$(curl -s "https://api.github.com/repos/google/go-containerregistry/releases/latest" | jq -r '.tag_name')
@@ -40,6 +40,30 @@ install_crane() {
   rm crane
   rm go-containerregistry.tar.gz
   popd || _error "Cannot exit temporary directory"
+}
+
+# Install gcrane
+install_gcrane() {
+  local -r tmpdir="$(mktemp -d)"
+  pushd "$tmpdir" || _error "Cannot create temporary directory"
+  curl -L "https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz" \
+    -o go-containerregistry.tar.gz
+  tar -zxvf go-containerregistry.tar.gz gcrane
+  sudo install gcrane /usr/local/bin/
+  rm gcrane
+  rm go-containerregistry.tar.gz
+  popd || _error "Cannot exit temporary directory"
+}
+
+# Install container structure tests
+install_cst() {
+  local -r tmpdir="$(mktemp -d)"
+  pushd "$tmpdir" || _error "Cannot create temporary directory"
+  curl -LO https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-amd64 \
+    -o container-structure-test
+  sudo install container-structure-test /usr/local/bin
+  rm container-structure-test
+  popd || error "Cannot exit temporary directory"
 }
 
 # Installing ko, this is only required for local run-web debugging
@@ -74,13 +98,21 @@ install_bat() {
 EOF
 }
 
+# Install yadm for dotfiles management
+install_yadm() {
+  sudo apt -qq install yadm -y
+}
+
 main() {
   install_skaffold_deps
   install_skaffold
   install_ko
   install_shellcheck
   install_crane
+  install_gcrane
+  install_cst
   install_bat
+  install_yadm
 }
 
 main "${@}"
