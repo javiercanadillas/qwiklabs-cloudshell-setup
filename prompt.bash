@@ -130,7 +130,7 @@ __powerline() {
       venv="$COLOR_CONDA$(__virtualenv2)$COLOR_RESET"
     fi
 
-    PS1="┌──${host}$cwd$venv$git\n└─>$symbol"
+    PS1="┌──$(history -a)${host}$cwd$venv$git\n└─>$symbol"
   }
 
   PROMPT_COMMAND=ps1
